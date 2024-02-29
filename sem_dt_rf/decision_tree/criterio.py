@@ -28,7 +28,6 @@ class Criterion:
             q = q_all - i / feature.shape[0] * q_left - (feature.shape[0] - i) / feature.shape[0] * q_right
             if q > q_max:
                 i_max, q_max = i, q
-
         threshold = (feature[ind[i_max]] + feature[ind[i_max] - 1]) / 2
         return threshold, q_max
 
@@ -91,7 +90,14 @@ class EntropyCriterion(Criterion):
 
 class MSECriterion(Criterion):
     def get_predict_val(self, target):
-        raise NotImplementedError("Put your code here")
+        #print(target)
+        return sum(target)/len(target)
 
     def score(self, target):
-        raise NotImplementedError("Put your code here")
+        #print('1')
+        if len(target) == 0:
+            return 0
+        pred = self.get_predict_val(target)
+        #print('pred' , pred)
+        #print((np.array([pred]) * len(target) - target)**2 / len(target))
+        return (np.array([pred]) * len(target) - target) @ (np.array([pred]) * len(target) - target) / len(target)

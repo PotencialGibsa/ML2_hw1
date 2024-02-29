@@ -2,7 +2,7 @@ from typing import Optional
 
 import numpy as np
 
-from sem_dt_rf.decision_tree.criterio import Criterion, GiniCriterion, EntropyCriterion
+from sem_dt_rf.decision_tree.criterio import Criterion, GiniCriterion, EntropyCriterion, MSECriterion
 from sem_dt_rf.decision_tree.tree_node import TreeNode
 
 
@@ -109,4 +109,52 @@ class ClassificationDecisionTree(DecisionTree):
         self.tree_width(node.child_left, importance_array)
         self.tree_width(node.child_right, importance_array)
 
+
+
+class RegressionDecisionTree(DecisionTree):
+    def __init__(self, criterion: str = "MSE", **kwargs):
+        super().__init__(**kwargs)
+
+        if criterion not in ["MSE"]:
+            raise ValueError('Unsupported criterion', criterion)
+        self.criterion = criterion
+        self.n_classes = 0
+        self.n_features = 0
+        self.root = None
+
+    def fit(self, x, y):
+        #self.n_classes = np.unique(y).shape[0]
+        self.n_features = x.shape[1]
+        criterion = MSECriterion()
+        self.root = TreeNode(
+            depth=0,
+            predict_val=criterion.get_predict_val(y),
+            impurity=criterion.score(y)
+        )
+        self._build_nodes(x, y, criterion, np.arange(x.shape[0]), self.root)
+        return self
+
+    def predict(self, x: np.ndarray) -> np.ndarray:
+        pred = np.zeros(x.shape[0])
+        self._get_nodes_predictions(x, pred, np.arange(x.shape[0]), self.root)
+        return pred
+
+    @property
+    def feature_importance_(self) -> np.ndarray:
+        """
+        Returns
+        -------
+        importance : cumulative improvement per feature, np.ndarray.shape = (n_features, )
+        """
+        importance_array = np.zeros(self.n_features)
+        self.tree_width(self.root, importance_array)
+        return importance_array
+
+
+    def tree_width(self, node, importance_array):
+        if node.is_terminal:
+            return
+        importance_array[node.feature] += node.impurity
+        self.tree_width(node.child_left, importance_array)
+        self.tree_width(node.child_right, importance_array)
         
