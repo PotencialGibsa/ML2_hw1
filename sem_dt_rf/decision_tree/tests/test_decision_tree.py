@@ -37,3 +37,21 @@ class TestDecisionTree(unittest.TestCase):
         predictions = clas_tree.predict(x)
         assert (predictions == y).mean() > 0.95
 
+    def test_feature_importance(self):
+        np.random.seed(1)
+        clas_tree = ClassificationDecisionTree(max_depth=4, min_leaf_size=1)
+        x = np.vstack((
+            np.random.normal(loc=(-5, -5), size=(10, 2)),
+            np.random.normal(loc=(-5, 5), size=(10, 2)),
+            np.random.normal(loc=(5, -5), size=(10, 2)),
+            np.random.normal(loc=(5, 5), size=(10, 2)),
+        ))
+        y = np.array(
+            [0] * 20 + [1] * 20
+        )
+        clas_tree.fit(x, y)
+        predictions = clas_tree.predict(x)
+
+        importance = clas_tree.feature_importance_
+        assert (importance.shape[0] == x.shape[1])
+

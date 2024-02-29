@@ -62,7 +62,13 @@ class RandomForest:
         """
         if not (0 < len(self.estimators) == len(self.indices)):
             raise RuntimeError('Bagger is not fitted', (len(self.estimators), len(self.indices)))
-        raise NotImplementedError('Put your code here')
+        probas = 0
+        for estimator_n in range(self.n_estimators):
+            x_est = x[:, self.indices[estimator_n]]
+            probas += self.estimators[estimator_n].predict_proba(x_est)
+        probas = probas / self.n_estimators
+        return probas
+                
 
     def predict(self, x):
         """
@@ -70,7 +76,7 @@ class RandomForest:
         -------
         predictions : numpy ndarrays of shape (n_objects, )
         """
-        raise NotImplementedError('Put your code here')
+        return self.predict_proba(x).argmax(axis=1)
 
 
 class RandomForestClassifier(RandomForest):

@@ -151,8 +151,8 @@ class RandomForestTests(TestCase):
         rf.indices = feature_sampler.indices
 
         x = np.arange(10 * n_features).reshape(10, n_features)
-
         y_predict = rf.predict_proba(x)
+        
         y_expected = np.asarray([
             [0.42165396, 0.31929012, 0.39484171],
             [0.52803114, 0.49340856, 0.34016372],

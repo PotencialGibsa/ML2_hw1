@@ -51,8 +51,9 @@ class DecisionTree:
             predictions[indices] = node.predict_val
             return
         mask = node.get_best_split_mask(x)
-        self._get_nodes_predictions(x, predictions, indices[~mask], node.child_left)
-        self._get_nodes_predictions(x, predictions, indices[mask], node.child_right)
+        # We need to give chosen slice of the x to get_best_split_mask
+        self._get_nodes_predictions(x[~mask], predictions, indices[~mask], node.child_left) # here was the mistake
+        self._get_nodes_predictions(x[mask], predictions, indices[mask], node.child_right) # here was the mistake
 
 
 class ClassificationDecisionTree(DecisionTree):
@@ -96,5 +97,16 @@ class ClassificationDecisionTree(DecisionTree):
         -------
         importance : cumulative improvement per feature, np.ndarray.shape = (n_features, )
         """
+        importance_array = np.zeros(self.n_features)
+        self.tree_width(self.root, importance_array)
+        return importance_array
 
-        raise NotImplementedError("Put your code here")
+
+    def tree_width(self, node, importance_array):
+        if node.is_terminal:
+            return
+        importance_array[node.feature] += node.impurity
+        self.tree_width(node.child_left, importance_array)
+        self.tree_width(node.child_right, importance_array)
+
+        
