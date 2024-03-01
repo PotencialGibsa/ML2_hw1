@@ -96,7 +96,7 @@ class RandomForestClassifier(RandomForest):
             **params,
         )
 
-
+    # method for sklearn estimator api
     def get_params(self, deep=True):
         return {
             'n_estimators': self.n_estimators,

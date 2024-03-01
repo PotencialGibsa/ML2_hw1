@@ -90,14 +90,10 @@ class EntropyCriterion(Criterion):
 
 class MSECriterion(Criterion):
     def get_predict_val(self, target):
-        #print(target)
         return sum(target)/len(target)
 
     def score(self, target):
-        #print('1')
         if len(target) == 0:
             return 0
         pred = self.get_predict_val(target)
-        #print('pred' , pred)
-        #print((np.array([pred]) * len(target) - target)**2 / len(target))
         return (np.array([pred]) * len(target) - target) @ (np.array([pred]) * len(target) - target) / len(target)
