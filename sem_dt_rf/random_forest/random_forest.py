@@ -95,3 +95,13 @@ class RandomForestClassifier(RandomForest):
             min_samples_leaf=min_samples_leaf,
             **params,
         )
+
+
+    def get_params(self, deep=True):
+        return {
+            'n_estimators': self.n_estimators,
+            'max_objects_samples': self.object_sampler.max_samples,
+            'max_features_samples': self.feature_sampler.max_samples,
+            'max_depth': self.params['max_depth'],
+            'min_samples_leaf': self.params['min_samples_leaf'],
+        }
